@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email_combination</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+  }
+  #container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between; /* 將子元素在垂直方向上均勻分佈 */
+  height: 200vh; /* 設置容器高度為可視區域的 100% */
+  border: 1px solid #ccc;
+  padding: 200px;
+  background-color: white;
+    }
+
+  #inputDiv {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  #inputBox {
+    width: 70%;
+    padding: 5px;
+  }
+  #submitButton {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 10px;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+  }
+  #resultDiv {
+    width: 80%;
+    max-height: 300px;
+    overflow-y: scroll;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    padding: 100px;
+  }
+  .list-item-divider {
+  border-top: 1px solid #ccc;
+  margin-top: 10px;
+  padding-top: 10px;
+}   
+.credit {
+  position: fixed;
+  top: 10px; /* 距離頂部的距離 */
+  right: 10px; /* 距離右側的距離 */
+  background-color: rgba(0, 0, 0, 0.5); /* 背景顏色，這裡是半透明黑色 */
+  color: white; /* 文本顏色 */
+  padding: 5px 10px; /* 內邊距，可根據需要調整 */
+  border-radius: 5px; /* 圓角 */
+  font-size: 12px; /* 文本大小，可根據需要調整 */
+}
+
+</style>
+</head>
+<body>
+  <div class="credit">KK製作</div>
+<div id="container">
+  <div id="inputDiv">
+    <input type="text" id="inputBox" placeholder="在這輸入Email">
+    <button id="submitButton">確認</button>
+  </div>
+  <div id="grid">
+    <div id="tableDiv">
+      <table id="dataTable">
+        <!-- 表格內容將由 JavaScript 動態生成 -->
+      </table>
+    </div>
+  </div>
+  <div id="resultDiv">
+    <h2>Email 組合結果：</h2>
+    <ul id="resultList">
+    </ul>
+  </div>
+</div>
+
+<script>
+  /* 將 Python 函式轉換為 JavaScript 函式 */
+  function get_inttobin(num, bit_length = 1) {
+    const binary = num.toString(2).padStart(bit_length, '0');
+    return binary;
+  }
+
+  function Email_combination(email) {
+    const emailParts = email.split('@');
+    const dot = '.';
+    const n = emailParts[0].length - 1;
+
+    const ema_combination_list = [];
+    const bin_len = get_inttobin(Math.pow(2, n)).length;
+    const char = emailParts[0];
+
+    for (let i = 0; i < Math.pow(2, n); i++) {
+      const b = get_inttobin(i, bin_len);
+      let s = '';
+      for (let k = 0; k < emailParts[0].length; k++) {
+        if (b[k] === '1') {
+          s += dot + emailParts[0][k];
+        } else {
+          s += emailParts[0][k];
+        }
+      }
+      ema_combination_list.push(s + '@' + emailParts[1]);
+    }
+    return ema_combination_list;
+  }
+
+  /* 監聽按鈕點擊事件 */
+  const submitButton = document.getElementById("submitButton");
+  const resultList = document.getElementById("resultList");
+
+  submitButton.addEventListener("click", () => {
+    const inputBox = document.getElementById("inputBox");
+    const email = inputBox.value.trim();
+
+    const combinations = Email_combination(email);
+    displayCombinations(combinations);
+  });
+
+/* 顯示組合結果 */
+function displayCombinations(combinations) {
+  resultList.innerHTML = ""; // 清空結果列表
+
+  combinations.forEach((combination, index) => {
+    const listItem = document.createElement("li");
+    listItem.textContent = `${index + 1}\t${combination}`; // 使用 \t 分隔
+
+    const copyButton = document.createElement("button");
+    copyButton.textContent = "複製按鈕";
+    copyButton.addEventListener("click", () => {
+      copyToClipboard(combination);
+      listItem.style.color = "red"; // 改變結果文字顏色為紅色
+      copyButton.textContent = "已複製";
+      copyButton.disabled = true;
+    });
+
+    const divider = document.createElement("div");
+    divider.classList.add("list-item-divider");
+
+    listItem.appendChild(copyButton);
+    listItem.appendChild(divider);
+    resultList.appendChild(listItem);
+    /*if (index !== combinations.length - 1) {
+      const lineBreak = document.createElement("br");
+      resultList.appendChild(lineBreak);
+    }*/
+  });
+}
+/* 將指定文本複製到剪貼簿 */
+function copyToClipboard(text) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textArea);
+}
+</script>
+</body>
+</html>
+</html>
