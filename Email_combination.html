@@ -17,8 +17,8 @@
     background-color: #f0f0f0;
   }
   #container {
-  flex-direction: column;
-  align-items: center;
+
+
 
   border: 1px solid #ccc;
   padding: 200px;
@@ -89,6 +89,7 @@
     <input type="text" id="inputBox" placeholder="在這輸入Email">
     <button id="submitButton">確認</button>
   </div>
+  <button id="saveButton">保存到json</button>
   <div id="grid">
     <div id="tableDiv">
       <table id="dataTable">
@@ -104,6 +105,34 @@
 </div>
 
 <script>
+  const saveButton = document.getElementById("saveButton");
+
+saveButton.addEventListener("click", () => {
+  const inputBox = document.getElementById("inputBox");
+  const email = inputBox.value.trim();
+  const combinations = Email_combination(email);
+
+  // 創建一個對象來存儲結果
+  const resultObject = {};
+  combinations.forEach((combination, index) => {
+    resultObject[index + 1] = combination;
+  });
+
+  // 將結果轉換為JSON字符串
+  const jsonResult = JSON.stringify(resultObject, null, 2);
+
+  // 創建Blob對象
+  const blob = new Blob([jsonResult], { type: "application/json" });
+
+  // 創建一個包含下載鏈接的元素
+  const downloadLink = document.createElement("a");
+  downloadLink.href = URL.createObjectURL(blob);
+  downloadLink.download = "data.json";
+  downloadLink.textContent = "下載JSON文件";
+
+  // 模擬點擊下載鏈接
+  downloadLink.click();
+});
   /* 將 Python 函式轉換為 JavaScript 函式 */
   function get_inttobin(num, bit_length = 1) {
     const binary = num.toString(2).padStart(bit_length, '0');
